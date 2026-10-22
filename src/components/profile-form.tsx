@@ -31,7 +31,8 @@ export function ProfileForm({ submitLabel, onDone }: { submitLabel: string; onDo
     const username = f.username?.trim().toLowerCase() || null;
     if (username && !/^[a-z0-9_]{3,24}$/.test(username)) {
       setBusy(false);
-      return toast.error("Username: 3–24 lowercase letters, numbers or _");
+      toast.error("Username: 3–24 lowercase letters, numbers or _");
+      return;
     }
     const { error } = await supabase.from("profiles").update({
       display_name: f.display_name?.trim() || null,
@@ -49,7 +50,7 @@ export function ProfileForm({ submitLabel, onDone }: { submitLabel: string; onDo
       onboarded: true,
     }).eq("id", session.user.id);
     setBusy(false);
-    if (error) return toast.error(error.code === "23505" ? "That username is taken" : error.message);
+    if (error) { toast.error(error.code === "23505" ? "That username is taken" : error.message); return; }
     await refreshProfile();
     toast.success("Profile saved");
     onDone();
